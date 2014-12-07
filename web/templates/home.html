@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Katak{% endblock %}
+{% block body %}
+<div class="container">
+    <h1>Katak <small>&alpha;</small></h1>
+    <h4>A first-order Markov Chain trained on social network entries</h4>
+    <small><b>M. Benedicto, J. Cortez, F. Panganiban</b></small><br/>
+    <small>CS 180: Artificial Intelligence (P. Regonia), Department of Computer Science, University of the Phillipines - Diliman</small>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                <h2>Upload a corpus source</h2>
+                <p>You may upload a .txt file as an additional source for training the Markov Chain.</p>
+                <form action="/corpus/upload/" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                {% csrf_token %}
+                <div class="control-group">
+                    <div class="col-md-8">
+                    <input type="file" name="corpusFile" class="form-control"/>
+                    </div>
+                    <div class="col-md-4">
+                    <input type="submit" value="Upload" class="btn btn-success"/>
+                    </div>
+                </div>
+                </form>
+                </div>
+                {% if corpusFiles %}
+                <div class="col-md-12">
+                <h3>Existing source files</h3>
+                <ul>
+                    {% for cf in corpusFiles %}
+                    <li>{{ cf.fileName }} {% if not cf.trained %}<a class="btn btn-info btn-xs" href="/corpus/train/?fileId={{cf.id}}">Train</a> {% endif %}</li>
+                    {% endfor %}
+                </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h2>Import from Facebook or Twitter</h2>
+            <p>The best way to use Katak is to train the Markov Chain using your social network accounts.</p>
+        </div>
+    </div>
+    <hr/>
+    <div class="row" style="text-align: center;">
+        <div class="col-md-12">
+        <h1>Generate string!</h1>
+        <p>Here comes the fun part. With the sources listed above, Katak will generate a string from Markov Chain.</p>
+        <h2 id="outString"></h2>
+        <button class="btn btn-info" id="generate">Generate</button>
+        </div>
+    </div>
+    <hr/>
+    <center><small style="color: #AAAAAA">All corpus and social network data are only stored temporarily. We do not save your login credentials.<br/>Your session ID is: {{sessionId}}</small></center>
+</div>
+
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#generate").click(function(evt) {
+        $.get("/markov/generate", function(text) {
+            $("#outString").text(text);
+            $("#outString").css({"font-size": "50"}).animate({"font-size": "25"}, 500);
+        })
+    });
+});
+</script>
+{% endblock %}

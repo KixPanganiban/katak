@@ -36,7 +36,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'katak'
+    'katak',
+    'web'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -62,6 +63,9 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+MEDIA_ROOT = BASE_DIR+'/media/'
+MEDIA_URL = '/media/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
