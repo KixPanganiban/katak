@@ -85,8 +85,7 @@ window.fbAsyncInit = function() {
     js.src = "//connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
-</script>
-<script type="text/javascript">
+}
 $(document).ready(function() {
     // Train corpus
     $(".trainbutton").click(function(evt) {
@@ -110,6 +109,12 @@ $(document).ready(function() {
             }
         })
     })
+
+    // Train Facebook
+    $("#connect-facebook").click(function(evt) {
+        console.log("!!");
+        FB.login();
+    });
 
     // Generate
     $("#generate").click(function(evt) {
