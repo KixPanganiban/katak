@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Katak{% endblock %}
 {% block body %}
-<div class="container">
     <h1>Katak <small>&alpha;</small></h1>
     <h4>A first-order Markov Chain trained on social network entries</h4>
     <small><b>M. Benedicto, J. Cortez, F. Panganiban</b></small><br/>
@@ -39,6 +38,8 @@
         <div class="col-md-6">
             <h2>Import from Facebook or Twitter</h2>
             <p>The best way to use Katak is to train the Markov Chain using your social network accounts.</p>
+            <button class="btn btn-default"><i class="fa fa-twitter"></i> Import from Twitter</button>
+            <button class="btn btn-default"><i class="fa fa-facebook"></i> Import from Facebook</button>
         </div>
     </div>
     <hr/>
@@ -52,7 +53,6 @@
     </div>
     <hr/>
     <center><small style="color: #AAAAAA">All corpus and social network data are only stored temporarily. We do not save your login credentials.<br/>Your session ID is: {{sessionId}}</small></center>
-</div>
 
 {% endblock %}
 {% block js %}
