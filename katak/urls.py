@@ -11,4 +11,7 @@ urlpatterns = patterns('',
     url(r'^corpus/upload/$', 'web.views.uploadCorpus', name='uploadCorpus'),
     url(r'^corpus/train/$', 'web.views.trainCorpus', name='trainCorpus'),
     url(r'^markov/generate/$', 'web.views.generateString', name='generateString'),
+    url(r'^twitter/send/$', 'twitter.views.sendToAuth', name='sendToAuth'),
+    url(r'^twitter/receive/$', 'twitter.views.receiveAuth', name='receiveAuth'),
+    url(r'^twitter/train/$', 'twitter.views.trainTweets', name='trainTweets'),
 )

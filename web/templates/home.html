@@ -28,7 +28,12 @@
                 <h3>Existing source files</h3>
                 <ul>
                     {% for cf in corpusFiles %}
-                    <li>{{ cf.fileName }} {% if not cf.trained %}<a class="btn btn-info btn-xs" href="/corpus/train/?fileId={{cf.id}}">Train</a> {% endif %}</li>
+                    <li>
+                        {{ cf.fileName }}
+                        {% if not cf.trained %}
+                            <button class="btn btn-info btn-xs trainbutton" file-id="{{cf.id}}">Train</button>
+                        {% endif %}
+                    </li>
                     {% endfor %}
                 </ul>
                 </div>
@@ -38,8 +43,16 @@
         <div class="col-md-6">
             <h2>Import from Facebook or Twitter</h2>
             <p>The best way to use Katak is to train the Markov Chain using your social network accounts.</p>
-            <button class="btn btn-default"><i class="fa fa-twitter"></i> Import from Twitter</button>
-            <button class="btn btn-default"><i class="fa fa-facebook"></i> Import from Facebook</button>
+            {% if not twitter %}
+            <a class="btn btn-default" href="/twitter/send/"><i class="fa fa-twitter"></i> Connect to Twitter</a>
+            {% else %}
+                {% if not twitter_trained %}
+                    <button class="btn btn-info" id="train-tweets"><i class="fa fa-twitter"></i> Train from Tweets</button>
+                {% else %}
+                    <button class="btn btn-success" disabled="disabled"><i class="fa fa-twitter"></i> Trained from Twitter</button>
+                {% endif %}
+            {% endif %}
+            <button class="btn btn-default" id="connect-facebook"><i class="fa fa-facebook"></i> Connect to Facebook</button>
         </div>
     </div>
     <hr/>
@@ -57,7 +70,48 @@
 {% endblock %}
 {% block js %}
 <script type="text/javascript">
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '309476799243462',
+    cookie     : true,  // enable cookies to allow the server to access
+                        // the session
+    xfbml      : true,  // parse social plugins on this page
+    version    : 'v2.1' // use version 2.1
+  });
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+</script>
+<script type="text/javascript">
 $(document).ready(function() {
+    // Train corpus
+    $(".trainbutton").click(function(evt) {
+        var that = $(this);
+        var fileId = $(this).attr('file-id');
+        $(this).attr('disabled', 'disabled').text("Training...");
+        $.get("/corpus/train/?fileId="+fileId, function(data) {
+            if (data == "OK") {
+                that.hide();
+            }
+        })
+    })
+
+    // Train Twitter
+    $("#train-tweets").click(function(evt) {
+        var that = $(this);
+        $(this).attr('disabled', 'disabled').text("Training...");
+        $.get("/twitter/train/", function(data) {
+            if (data == "OK") {
+                that.removeClass("btn-info").addClass("btn-success").text("Trained from Twitter");
+            }
+        })
+    })
+
+    // Generate
     $("#generate").click(function(evt) {
         $.get("/markov/generate", function(text) {
             $("#outString").text(text);

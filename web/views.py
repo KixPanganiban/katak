@@ -16,7 +16,9 @@ def home(request):
         request.session["sessionId"] = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
     return render(request, "home.html", {
         "corpusFiles": CorpusFile.objects.filter(owner=getSessionId(request)),
-        "sessionId": getSessionId(request)
+        "sessionId": getSessionId(request),
+        "twitter": True if "twitter_verifier" in request.session else False,
+        "twitter_trained": True if "twitter_trained" in request.session else False
         })
 
 def uploadCorpus(request):
@@ -97,7 +99,7 @@ def trainCorpus(request):
 
     bigram.closeBigram()
 
-    return redirect("/")
+    return HttpResponse("OK")
 
 
 def generateString(request):

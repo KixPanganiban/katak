@@ -42,8 +42,6 @@ class Bigram():
             self.nodeset[word_a].isBeginning = isBeginning
         self.nodeset[word_a].addNext(word_b)
 
-        print word_a, "->", word_b
-
     def nextWords(self, word):
         if word not in self.nodeset:
             raise Exception("Word not in bigram table.")
