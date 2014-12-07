@@ -1,1 +1,4 @@
 *.pyc
+*.b
+*.sqlite3
+media/
