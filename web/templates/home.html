@@ -41,18 +41,32 @@
             </div>
         </div>
         <div class="col-md-6">
-            <h2>Import from Facebook or Twitter</h2>
-            <p>The best way to use Katak is to train the Markov Chain using your social network accounts.</p>
-            {% if not twitter %}
-            <a class="btn btn-default" href="/twitter/send/"><i class="fa fa-twitter"></i> Connect to Twitter</a>
-            {% else %}
-                {% if not twitter_trained %}
-                    <button class="btn btn-info" id="train-tweets"><i class="fa fa-twitter"></i> Train from Tweets</button>
+            <div class="row">
+                <div class="col-md-12">
+                <h2>Import from Facebook or Twitter</h2>
+                <p>The best way to use Katak is to train the Markov Chain using your social network accounts.</p>
+                {% if not twitter %}
+                <a class="btn btn-default" href="/twitter/send/"><i class="fa fa-twitter"></i> Connect to Twitter</a>
                 {% else %}
-                    <button class="btn btn-success" disabled="disabled"><i class="fa fa-twitter"></i> Trained from Twitter</button>
+                    {% if not twitter_trained %}
+                        <button class="btn btn-info" id="train-tweets"><i class="fa fa-twitter"></i> Train from Tweets</button>
+                    {% else %}
+                        <button class="btn btn-success" disabled="disabled"><i class="fa fa-twitter"></i> Trained from Twitter</button>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-            <button class="btn btn-default" id="connect-facebook"><i class="fa fa-facebook"></i> Connect to Facebook</button>
+                {% if not facebook %}
+                    <button class="btn btn-default" id="connect-facebook"><i class="fa fa-facebook"></i> Connect to Facebook</button>
+                {% else %}
+                    <button class="btn btn-info" id="train-facebook"><i class="fa fa-facebook"></i> Train from Facebook Posts</button>
+                {% endif %}
+                <div id="fb-root"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-warning hidden" id="sorry">Unfortunately, Facebook has not yet approved our app permission to pull your Facebook posts. We apologize for that. Check back soon!</div>
+                </div>
+            </div>
         </div>
     </div>
     <hr/>
@@ -70,23 +84,16 @@
 {% endblock %}
 {% block js %}
 <script type="text/javascript">
-window.fbAsyncInit = function() {
-  FB.init({
-    appId      : '309476799243462',
-    cookie     : true,  // enable cookies to allow the server to access
-                        // the session
-    xfbml      : true,  // parse social plugins on this page
-    version    : 'v2.1' // use version 2.1
-  });
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-}
 $(document).ready(function() {
+    // Load Facebook SDK
+    $.ajaxSetup({ cache: true });
+      $.getScript('//connect.facebook.net/en_UK/all.js', function(){
+        FB.init({
+          appId: '309793455878463',
+        });
+      });
+
+
     // Train corpus
     $(".trainbutton").click(function(evt) {
         var that = $(this);
@@ -110,10 +117,39 @@ $(document).ready(function() {
         })
     })
 
-    // Train Facebook
+    // Connect Facebook
     $("#connect-facebook").click(function(evt) {
-        console.log("!!");
-        FB.login();
+        var that = $(this);
+        FB.login(function(response) {
+            if (response.authResponse) {
+                $.ajax({
+                    type: "POST",
+                    url: "/facebook/savetoken/",
+                    data: {
+                        token: response.authResponse.accessToken
+                    }
+                }).done(function(response) {
+                        if (response == 'OK') {
+                            console.log("Facebook ok");
+                            that.html('<i class="fa fa-facebook"></i> Train from Facebook Posts').removeClass('btn-default').addClass('btn-info');
+                        } else {
+                            console.log(response);
+                        }
+                });
+            } else {
+                console.log("Facebook oAuth login failed.");
+            }
+        });
+    });
+
+    // Train Facebook
+    $("#train-facebook").click(function(evt) {
+        $("#sorry").removeClass("hidden").fadeIn();
+        /*$.get("/facebook/train/", function(response) {
+            if (response == 'OK') {
+
+            }
+        });*/
     });
 
     // Generate

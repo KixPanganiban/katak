@@ -14,4 +14,6 @@ urlpatterns = patterns('',
     url(r'^twitter/send/$', 'twitter.views.sendToAuth', name='sendToAuth'),
     url(r'^twitter/receive/$', 'twitter.views.receiveAuth', name='receiveAuth'),
     url(r'^twitter/train/$', 'twitter.views.trainTweets', name='trainTweets'),
+    url(r'^facebook/savetoken/$', 'facebookapp.views.saveToken', name='saveToken'),
+    url(r'^facebook/train/$', 'facebookapp.views.trainPosts', name='trainPosts'),
 )
