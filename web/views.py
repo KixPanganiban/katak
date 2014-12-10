@@ -12,6 +12,9 @@ def getSessionId(request):
     return request.session["sessionId"]
 
 def home(request):
+    """
+    Main view handler. Also initializes the request session ID.
+    """
     if "sessionId" not in request.session:
         request.session["sessionId"] = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
     return render(request, "home.html", {
@@ -23,6 +26,9 @@ def home(request):
         })
 
 def uploadCorpus(request):
+    """
+    Handles uploading of the corpus file.
+    """
     corpusForm = CorpusForm(request.POST, request.FILES)
     if corpusForm.is_valid():
         newCorpus = CorpusFile(
@@ -37,6 +43,9 @@ def uploadCorpus(request):
     return redirect("/")
 
 def trainCorpus(request):
+    """
+    Trains the corpus file into the Markov Chain Bigram.
+    """
     try:
         corpusFile = CorpusFile.objects.get(id=request.GET.get("fileId"))
         corpusFilePath = corpusFile.corpusFile.path
@@ -46,6 +55,9 @@ def trainCorpus(request):
     corpusStream = Queue()
 
     def readToken():
+        """
+        Get a token from the Queue.
+        """
         if corpusStream.empty():
             return None
         return corpusStream.get()
@@ -104,6 +116,9 @@ def trainCorpus(request):
 
 
 def generateString(request):
+    """
+    Fun part! Generate a string from the Markov Chain.
+    """
     bigram = Bigram()
     bigram.openBigram("%s.b"%(getSessionId(request)))
     try:

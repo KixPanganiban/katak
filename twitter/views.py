@@ -7,16 +7,27 @@ import re
 import tweepy
 
 def sendToAuth(request):
+    """
+    Redirects the user to the Twiter oAuth page.
+    """
     auth = tweepy.OAuthHandler('Znumu9sLUUBdP0BIMKjonvzJN','sSaibMpTbcSjQwfWl1Rgl63uowZRiGdjysKxtJ4faf2L7Yxrs8')
     redirect_url = auth.get_authorization_url()
     request.session["twitter_request_token"] = auth.request_token
     return redirect(redirect_url)
 
 def receiveAuth(request):
+    """
+    Callback view that receives the user from the Twitter
+    oAuth page.
+    """
     request.session["twitter_verifier"] = request.GET.get('oauth_verifier')
     return redirect("/")
 
 def trainTweets(request):
+    """
+    Feeds the recent tweets from the authenticated user's timeline into
+    the Markov Chain Bigram.
+    """
     auth = tweepy.OAuthHandler('Znumu9sLUUBdP0BIMKjonvzJN','sSaibMpTbcSjQwfWl1Rgl63uowZRiGdjysKxtJ4faf2L7Yxrs8')
     auth.request_token = request.session["twitter_request_token"]
     auth.get_access_token(request.session["twitter_verifier"])
@@ -26,6 +37,9 @@ def trainTweets(request):
     tweetStream = Queue()
 
     def readToken():
+        """
+        Get a token from the Queue.
+        """
         if tweetStream.empty():
             return None
         return tweetStream.get()
